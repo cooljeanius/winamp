@@ -59,8 +59,9 @@ class AbiChecker:
         self._setup_logger()
         self.report_dir = os.path.abspath(configuration.report_dir)
         self.keep_all_reports = configuration.keep_all_reports
-        self.can_remove_report_dir = not (os.path.exists(self.report_dir) or
-                                          self.keep_all_reports)
+        self.can_remove_report_dir = not (
+            os.path.exists(self.report_dir) or self.keep_all_reports
+        )
         self.old_version = old_version
         self.new_version = new_version
         self.skip_file = configuration.skip_file
@@ -98,30 +99,39 @@ class AbiChecker:
                 )
             )
             fetch_output = subprocess.check_output(
-                [self.git_command, "fetch",
-                 version.repository, version.revision],
+                [self.git_command, "fetch", version.repository, version.revision],
                 cwd=self.repo_path,
-                stderr=subprocess.STDOUT
+                stderr=subprocess.STDOUT,
             )
             self.log.debug(fetch_output.decode("utf-8"))
             worktree_rev = "FETCH_HEAD"
         else:
-            self.log.debug("Checking out git worktree for revision {}".format(
-                version.revision
-            ))
+            self.log.debug(
+                "Checking out git worktree for revision {}".format(version.revision)
+            )
             worktree_rev = version.revision
         worktree_output = subprocess.check_output(
-            [self.git_command, "worktree", "add", "--detach",
-             git_worktree_path, worktree_rev],
+            [
+                self.git_command,
+                "worktree",
+                "add",
+                "--detach",
+                git_worktree_path,
+                worktree_rev,
+            ],
             cwd=self.repo_path,
-            stderr=subprocess.STDOUT
+            stderr=subprocess.STDOUT,
         )
         self.log.debug(worktree_output.decode("utf-8"))
-        version.commit = subprocess.check_output(
-            [self.git_command, "rev-parse", "HEAD"],
-            cwd=git_worktree_path,
-            stderr=subprocess.STDOUT
-        ).decode("ascii").rstrip()
+        version.commit = (
+            subprocess.check_output(
+                [self.git_command, "rev-parse", "HEAD"],
+                cwd=git_worktree_path,
+                stderr=subprocess.STDOUT,
+            )
+            .decode("ascii")
+            .rstrip()
+        )
         self.log.debug("Commit is {}".format(version.commit))
         return git_worktree_path
 
@@ -130,21 +140,27 @@ class AbiChecker:
         if version.crypto_revision exists, update it to that revision,
         otherwise update it to the default revision"""
         update_output = subprocess.check_output(
-            [self.git_command, "submodule", "update", "--init", '--recursive'],
+            [self.git_command, "submodule", "update", "--init", "--recursive"],
             cwd=git_worktree_path,
-            stderr=subprocess.STDOUT
+            stderr=subprocess.STDOUT,
         )
         self.log.debug(update_output.decode("utf-8"))
-        if not (os.path.exists(os.path.join(git_worktree_path, "crypto"))
-                and version.crypto_revision):
+        if not (
+            os.path.exists(os.path.join(git_worktree_path, "crypto"))
+            and version.crypto_revision
+        ):
             return
 
         if version.crypto_repository:
             fetch_output = subprocess.check_output(
-                [self.git_command, "fetch", version.crypto_repository,
-                 version.crypto_revision],
+                [
+                    self.git_command,
+                    "fetch",
+                    version.crypto_repository,
+                    version.crypto_revision,
+                ],
                 cwd=os.path.join(git_worktree_path, "crypto"),
-                stderr=subprocess.STDOUT
+                stderr=subprocess.STDOUT,
             )
             self.log.debug(fetch_output.decode("utf-8"))
             crypto_rev = "FETCH_HEAD"
@@ -154,7 +170,7 @@ class AbiChecker:
         checkout_output = subprocess.check_output(
             [self.git_command, "checkout", crypto_rev],
             cwd=os.path.join(git_worktree_path, "crypto"),
-            stderr=subprocess.STDOUT
+            stderr=subprocess.STDOUT,
         )
         self.log.debug(checkout_output.decode("utf-8"))
 
@@ -169,14 +185,12 @@ class AbiChecker:
             [self.make_command, "lib"],
             env=my_environment,
             cwd=git_worktree_path,
-            stderr=subprocess.STDOUT
+            stderr=subprocess.STDOUT,
         )
         self.log.debug(make_output.decode("utf-8"))
         for root, _dirs, files in os.walk(git_worktree_path):
             for file in fnmatch.filter(files, "*.so"):
-                version.modules[os.path.splitext(file)[0]] = (
-                    os.path.join(root, file)
-                )
+                version.modules[os.path.splitext(file)[0]] = os.path.join(root, file)
 
     @staticmethod
     def _pretty_revision(version):
@@ -191,19 +205,19 @@ class AbiChecker:
         present in version.modules."""
         for mbed_module, module_path in version.modules.items():
             output_path = os.path.join(
-                self.report_dir, "{}-{}-{}.dump".format(
-                    mbed_module, version.revision, version.version
-                )
+                self.report_dir,
+                "{}-{}-{}.dump".format(mbed_module, version.revision, version.version),
             )
             abi_dump_command = [
                 "abi-dumper",
                 module_path,
-                "-o", output_path,
-                "-lver", self._pretty_revision(version),
+                "-o",
+                output_path,
+                "-lver",
+                self._pretty_revision(version),
             ]
             abi_dump_output = subprocess.check_output(
-                abi_dump_command,
-                stderr=subprocess.STDOUT
+                abi_dump_command, stderr=subprocess.STDOUT
             )
             self.log.debug(abi_dump_output.decode("utf-8"))
             version.abi_dumps[mbed_module] = output_path
@@ -214,7 +228,7 @@ class AbiChecker:
         worktree_output = subprocess.check_output(
             [self.git_command, "worktree", "prune"],
             cwd=self.repo_path,
-            stderr=subprocess.STDOUT
+            stderr=subprocess.STDOUT,
         )
         self.log.debug(worktree_output.decode("utf-8"))
 
@@ -235,8 +249,13 @@ class AbiChecker:
                 self._remove_children_with_tag(child, tag)
 
     def _remove_extra_detail_from_report(self, report_root):
-        for tag in ['test_info', 'test_results', 'problem_summary',
-                    'added_symbols', 'affected']:
+        for tag in [
+            "test_info",
+            "test_results",
+            "problem_summary",
+            "added_symbols",
+            "affected",
+        ]:
             self._remove_children_with_tag(report_root, tag)
 
         for report in report_root:
@@ -249,41 +268,46 @@ class AbiChecker:
         The report will be placed in output_path."""
         abi_compliance_command = [
             "abi-compliance-checker",
-            "-l", mbed_module,
-            "-old", self.old_version.abi_dumps[mbed_module],
-            "-new", self.new_version.abi_dumps[mbed_module],
+            "-l",
+            mbed_module,
+            "-old",
+            self.old_version.abi_dumps[mbed_module],
+            "-new",
+            self.new_version.abi_dumps[mbed_module],
             "-strict",
-            "-report-path", output_path,
+            "-report-path",
+            output_path,
         ]
         if self.skip_file:
-            abi_compliance_command += ["-skip-symbols", self.skip_file,
-                                       "-skip-types", self.skip_file]
+            abi_compliance_command += [
+                "-skip-symbols",
+                self.skip_file,
+                "-skip-types",
+                self.skip_file,
+            ]
         if self.brief:
-            abi_compliance_command += ["-report-format", "xml",
-                                       "-stdout"]
+            abi_compliance_command += ["-report-format", "xml", "-stdout"]
         return abi_compliance_command
 
     def _is_library_compatible(self, mbed_module, compatibility_report):
         """Test if the library mbed_module has remained compatible.
         Append a message regarding compatibility to compatibility_report."""
         output_path = os.path.join(
-            self.report_dir, "{}-{}-{}.html".format(
-                mbed_module, self.old_version.revision,
-                self.new_version.revision
-            )
+            self.report_dir,
+            "{}-{}-{}.html".format(
+                mbed_module, self.old_version.revision, self.new_version.revision
+            ),
         )
         try:
             subprocess.check_output(
                 self._abi_compliance_command(mbed_module, output_path),
-                stderr=subprocess.STDOUT
+                stderr=subprocess.STDOUT,
             )
         except subprocess.CalledProcessError as err:
             if err.returncode != 1:
                 raise err
             if self.brief:
-                self.log.info(
-                    "Compatibility issues found for {}".format(mbed_module)
-                )
+                self.log.info("Compatibility issues found for {}".format(mbed_module))
                 report_root = ET.fromstring(err.output.decode("utf-8"))
                 self._remove_extra_detail_from_report(report_root)
                 self.log.info(ET.tostring(report_root).decode("utf-8"))
@@ -305,16 +329,18 @@ class AbiChecker:
         """Generate a report of the differences between the reference ABI
         and the new ABI. ABI dumps from self.old_version and self.new_version
         must be available."""
-        compatibility_report = ["Checking evolution from {} to {}".format(
-            self._pretty_revision(self.old_version),
-            self._pretty_revision(self.new_version)
-        )]
+        compatibility_report = [
+            "Checking evolution from {} to {}".format(
+                self._pretty_revision(self.old_version),
+                self._pretty_revision(self.new_version),
+            )
+        ]
         compliance_return_code = 0
-        shared_modules = list(set(self.old_version.modules.keys()) &
-                              set(self.new_version.modules.keys()))
+        shared_modules = list(
+            set(self.old_version.modules.keys()) & set(self.new_version.modules.keys())
+        )
         for mbed_module in shared_modules:
-            if not self._is_library_compatible(mbed_module,
-                                               compatibility_report):
+            if not self._is_library_compatible(mbed_module, compatibility_report):
                 compliance_return_code = 1
         for version in [self.old_version, self.new_version]:
             for mbed_module, mbed_module_dump in version.abi_dumps.items():
@@ -350,55 +376,79 @@ def run_main():
             )
         )
         parser.add_argument(
-            "-v", "--verbose", action="store_true",
+            "-v",
+            "--verbose",
+            action="store_true",
             help="set verbosity level",
         )
         parser.add_argument(
-            "-r", "--report-dir", type=str, default="reports",
+            "-r",
+            "--report-dir",
+            type=str,
+            default="reports",
             help="directory where reports are stored, default is reports",
         )
         parser.add_argument(
-            "-k", "--keep-all-reports", action="store_true",
+            "-k",
+            "--keep-all-reports",
+            action="store_true",
             help="keep all reports, even if there are no compatibility issues",
         )
         parser.add_argument(
-            "-o", "--old-rev", type=str, help="revision for old version.",
+            "-o",
+            "--old-rev",
+            type=str,
+            help="revision for old version.",
             required=True,
         )
         parser.add_argument(
             "-or", "--old-repo", type=str, help="repository for old version."
         )
         parser.add_argument(
-            "-oc", "--old-crypto-rev", type=str,
-            help="revision for old crypto submodule."
+            "-oc",
+            "--old-crypto-rev",
+            type=str,
+            help="revision for old crypto submodule.",
         )
         parser.add_argument(
-            "-ocr", "--old-crypto-repo", type=str,
-            help="repository for old crypto submodule."
+            "-ocr",
+            "--old-crypto-repo",
+            type=str,
+            help="repository for old crypto submodule.",
         )
         parser.add_argument(
-            "-n", "--new-rev", type=str, help="revision for new version",
+            "-n",
+            "--new-rev",
+            type=str,
+            help="revision for new version",
             required=True,
         )
         parser.add_argument(
             "-nr", "--new-repo", type=str, help="repository for new version."
         )
         parser.add_argument(
-            "-nc", "--new-crypto-rev", type=str,
-            help="revision for new crypto version"
+            "-nc", "--new-crypto-rev", type=str, help="revision for new crypto version"
         )
         parser.add_argument(
-            "-ncr", "--new-crypto-repo", type=str,
-            help="repository for new crypto submodule."
+            "-ncr",
+            "--new-crypto-repo",
+            type=str,
+            help="repository for new crypto submodule.",
         )
         parser.add_argument(
-            "-s", "--skip-file", type=str,
-            help=("path to file containing symbols and types to skip "
-                  "(typically \"-s identifiers\" after running "
-                  "\"tests/scripts/list-identifiers.sh --internal\")")
+            "-s",
+            "--skip-file",
+            type=str,
+            help=(
+                "path to file containing symbols and types to skip "
+                '(typically "-s identifiers" after running '
+                '"tests/scripts/list-identifiers.sh --internal")'
+            ),
         )
         parser.add_argument(
-            "-b", "--brief", action="store_true",
+            "-b",
+            "--brief",
+            action="store_true",
             help="output only the list of issues to stdout, instead of a full report",
         )
         abi_args = parser.parse_args()
@@ -413,7 +463,7 @@ def run_main():
             crypto_repository=abi_args.old_crypto_repo,
             crypto_revision=abi_args.old_crypto_rev,
             abi_dumps={},
-            modules={}
+            modules={},
         )
         new_version = SimpleNamespace(
             version="new",
@@ -423,19 +473,19 @@ def run_main():
             crypto_repository=abi_args.new_crypto_repo,
             crypto_revision=abi_args.new_crypto_rev,
             abi_dumps={},
-            modules={}
+            modules={},
         )
         configuration = SimpleNamespace(
             verbose=abi_args.verbose,
             report_dir=abi_args.report_dir,
             keep_all_reports=abi_args.keep_all_reports,
             brief=abi_args.brief,
-            skip_file=abi_args.skip_file
+            skip_file=abi_args.skip_file,
         )
         abi_check = AbiChecker(old_version, new_version, configuration)
         return_code = abi_check.check_for_abi_changes()
         sys.exit(return_code)
-    except Exception: # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         # Print the backtrace and exit explicitly so as to exit with
         # status 2, not 1.
         traceback.print_exc()

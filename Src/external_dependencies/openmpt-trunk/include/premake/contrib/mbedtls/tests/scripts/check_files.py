@@ -65,7 +65,7 @@ class FileIssueTracker:
         seps = os.path.sep
         if os.path.altsep is not None:
             seps += os.path.altsep
-        return '/'.join(filepath.split(seps))
+        return "/".join(filepath.split(seps))
 
     def should_check_file(self, filepath):
         """Whether the given file name should be checked.
@@ -76,8 +76,9 @@ class FileIssueTracker:
         for files_exemption in self.suffix_exemptions:
             if filepath.endswith(files_exemption):
                 return False
-        if self.path_exemptions and \
-           re.match(self.path_exemptions, self.normalize_path(filepath)):
+        if self.path_exemptions and re.match(
+            self.path_exemptions, self.normalize_path(filepath)
+        ):
             return False
         return True
 
@@ -100,23 +101,25 @@ class FileIssueTracker:
             logger.info(self.heading)
             for filename, lines in sorted(self.files_with_issues.items()):
                 if lines:
-                    logger.info("{}: {}".format(
-                        filename, ", ".join(str(x) for x in lines)
-                    ))
+                    logger.info(
+                        "{}: {}".format(filename, ", ".join(str(x) for x in lines))
+                    )
                 else:
                     logger.info(filename)
             logger.info("")
 
+
 BINARY_FILE_PATH_RE_LIST = [
-    r'docs/.*\.pdf\Z',
-    r'programs/fuzz/corpuses/[^.]+\Z',
-    r'tests/data_files/[^.]+\Z',
-    r'tests/data_files/.*\.(crt|csr|db|der|key|pubkey)\Z',
-    r'tests/data_files/.*\.req\.[^/]+\Z',
-    r'tests/data_files/.*malformed[^/]+\Z',
-    r'tests/data_files/format_pkcs12\.fmt\Z',
+    r"docs/.*\.pdf\Z",
+    r"programs/fuzz/corpuses/[^.]+\Z",
+    r"tests/data_files/[^.]+\Z",
+    r"tests/data_files/.*\.(crt|csr|db|der|key|pubkey)\Z",
+    r"tests/data_files/.*\.req\.[^/]+\Z",
+    r"tests/data_files/.*malformed[^/]+\Z",
+    r"tests/data_files/format_pkcs12\.fmt\Z",
 ]
-BINARY_FILE_PATH_RE = re.compile('|'.join(BINARY_FILE_PATH_RE_LIST))
+BINARY_FILE_PATH_RE = re.compile("|".join(BINARY_FILE_PATH_RE_LIST))
+
 
 class LineIssueTracker(FileIssueTracker):
     """Base class for line-by-line issue tracking.
@@ -151,7 +154,7 @@ class LineIssueTracker(FileIssueTracker):
 
 def is_windows_file(filepath):
     _root, ext = os.path.splitext(filepath)
-    return ext in ('.bat', '.dsp', '.dsw', '.sln', '.vcxproj')
+    return ext in (".bat", ".dsp", ".dsw", ".sln", ".vcxproj")
 
 
 class PermissionIssueTracker(FileIssueTracker):
@@ -246,13 +249,15 @@ class TabIssueTracker(LineIssueTracker):
     """Track lines with tabs."""
 
     heading = "Tabs present:"
-    suffix_exemptions = frozenset([
-        ".pem", # some openssl dumps have tabs
-        ".sln",
-        "/Makefile",
-        "/Makefile.inc",
-        "/generate_visualc_files.pl",
-    ])
+    suffix_exemptions = frozenset(
+        [
+            ".pem",  # some openssl dumps have tabs
+            ".sln",
+            "/Makefile",
+            "/Makefile.inc",
+            "/generate_visualc_files.pl",
+        ]
+    )
 
     def issue_with_line(self, line, _filepath):
         return b"\t" in line
@@ -266,12 +271,11 @@ class MergeArtifactIssueTracker(LineIssueTracker):
 
     def issue_with_line(self, line, _filepath):
         # Detect leftover git conflict markers.
-        if line.startswith(b'<<<<<<< ') or line.startswith(b'>>>>>>> '):
+        if line.startswith(b"<<<<<<< ") or line.startswith(b">>>>>>> "):
             return True
-        if line.startswith(b'||||||| '): # from merge.conflictStyle=diff3
+        if line.startswith(b"||||||| "):  # from merge.conflictStyle=diff3
             return True
-        if line.rstrip(b'\r\n') == b'=======' and \
-           not _filepath.endswith('.md'):
+        if line.rstrip(b"\r\n") == b"=======" and not _filepath.endswith(".md"):
             return True
         return False
 
@@ -314,14 +318,16 @@ class IntegrityChecker:
 
     @staticmethod
     def collect_files():
-        bytes_output = subprocess.check_output(['git', 'ls-files', '-z'])
-        bytes_filepaths = bytes_output.split(b'\0')[:-1]
-        ascii_filepaths = map(lambda fp: fp.decode('ascii'), bytes_filepaths)
+        bytes_output = subprocess.check_output(["git", "ls-files", "-z"])
+        bytes_filepaths = bytes_output.split(b"\0")[:-1]
+        ascii_filepaths = map(lambda fp: fp.decode("ascii"), bytes_filepaths)
         # Prepend './' to files in the top-level directory so that
         # something like `'/Makefile' in fp` matches in the top-level
         # directory as well as in subdirectories.
-        return [fp if os.path.dirname(fp) else os.path.join(os.curdir, fp)
-                for fp in ascii_filepaths]
+        return [
+            fp if os.path.dirname(fp) else os.path.join(os.curdir, fp)
+            for fp in ascii_filepaths
+        ]
 
     def check_files(self):
         for issue_to_check in self.issues_to_check:
@@ -341,7 +347,10 @@ class IntegrityChecker:
 def run_main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "-l", "--log_file", type=str, help="path to optional output log",
+        "-l",
+        "--log_file",
+        type=str,
+        help="path to optional output log",
     )
     check_args = parser.parse_args()
     integrity_check = IntegrityChecker(check_args.log_file)
