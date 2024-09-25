@@ -77,7 +77,10 @@ class TestDataParser:
         :param split_char: Split character
         :return: List of splits
         """
-        split_colon_fn = lambda x: re.sub(r"\\" + split_char, split_char, x)
+
+        def split_colon_fn(x):
+            return re.sub(r"\\" + split_char, split_char, x)
+
         if len(split_char) > 1:
             raise ValueError("Expected split character. Found string!")
         out = list(map(split_colon_fn, re.split(r"(?<!\\)" + split_char, inp_str)))

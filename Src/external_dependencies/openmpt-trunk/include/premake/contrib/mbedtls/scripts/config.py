@@ -7,20 +7,20 @@ Basic usage, to read the Mbed TLS or Mbed Crypto configuration:
     if 'MBEDTLS_RSA_C' in config: print('RSA is enabled')
 """
 
-## Copyright The Mbed TLS Contributors
-## SPDX-License-Identifier: Apache-2.0
+# Copyright The Mbed TLS Contributors
+# SPDX-License-Identifier: Apache-2.0
 ##
-## Licensed under the Apache License, Version 2.0 (the "License"); you may
-## not use this file except in compliance with the License.
-## You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 ##
-## http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 ##
-## Unless required by applicable law or agreed to in writing, software
-## distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-## WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-## See the License for the specific language governing permissions and
-## limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import os
 import re
@@ -182,7 +182,8 @@ EXCLUDE_FROM_FULL = frozenset(
         "MBEDTLS_ENTROPY_FORCE_SHA256",  # interacts with CTR_DRBG_128_BIT_KEY
         "MBEDTLS_HAVE_SSE2",  # hardware dependency
         "MBEDTLS_MEMORY_BACKTRACE",  # depends on MEMORY_BUFFER_ALLOC_C
-        "MBEDTLS_MEMORY_BUFFER_ALLOC_C",  # makes sanitizers (e.g. ASan) less effective
+        # makes sanitizers (e.g. ASan) less effective
+        "MBEDTLS_MEMORY_BUFFER_ALLOC_C",
         "MBEDTLS_MEMORY_DEBUG",  # depends on MEMORY_BUFFER_ALLOC_C
         "MBEDTLS_NO_64BIT_MULTIPLICATION",  # influences anything that uses bignum
         "MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES",  # removes a feature
@@ -200,9 +201,11 @@ EXCLUDE_FROM_FULL = frozenset(
         "MBEDTLS_SHA512_NO_SHA384",  # removes a feature
         "MBEDTLS_SSL_HW_RECORD_ACCEL",  # build dependency (hook functions)
         "MBEDTLS_TEST_CONSTANT_FLOW_MEMSAN",  # build dependency (clang+memsan)
-        "MBEDTLS_TEST_CONSTANT_FLOW_VALGRIND",  # build dependency (valgrind headers)
+        # build dependency (valgrind headers)
+        "MBEDTLS_TEST_CONSTANT_FLOW_VALGRIND",
         "MBEDTLS_TEST_NULL_ENTROPY",  # removes a feature
-        "MBEDTLS_X509_ALLOW_UNSUPPORTED_CRITICAL_EXTENSION",  # influences the use of X.509 in TLS
+        # influences the use of X.509 in TLS
+        "MBEDTLS_X509_ALLOW_UNSUPPORTED_CRITICAL_EXTENSION",
         "MBEDTLS_ZLIB_SUPPORT",  # build dependency (libz)
     ]
 )
@@ -250,7 +253,8 @@ def full_adapter(name, active, section):
 EXCLUDE_FROM_BAREMETAL = frozenset(
     [
         # pylint: disable=line-too-long
-        "MBEDTLS_ENTROPY_NV_SEED",  # requires a filesystem and FS_IO or alternate NV seed hooks
+        # requires a filesystem and FS_IO or alternate NV seed hooks
+        "MBEDTLS_ENTROPY_NV_SEED",
         "MBEDTLS_FS_IO",  # requires a filesystem
         "MBEDTLS_HAVEGE_C",  # requires a clock
         "MBEDTLS_HAVE_TIME",  # requires a clock

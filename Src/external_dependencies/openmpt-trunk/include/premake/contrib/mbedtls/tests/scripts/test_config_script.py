@@ -13,20 +13,20 @@ Sample usage:
     diff -ru old new
 """
 
-## Copyright The Mbed TLS Contributors
-## SPDX-License-Identifier: Apache-2.0
+# Copyright The Mbed TLS Contributors
+# SPDX-License-Identifier: Apache-2.0
 ##
-## Licensed under the Apache License, Version 2.0 (the "License"); you may
-## not use this file except in compliance with the License.
-## You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 ##
-## http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 ##
-## Unless required by applicable law or agreed to in writing, software
-## distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-## WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-## See the License for the specific language governing permissions and
-## limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import argparse
 import glob
@@ -145,11 +145,11 @@ def run_one(options, args, stem_prefix="", input_file=None):
     return stem + "+", data_filename
 
 
-### A list of symbols to test with.
-### This script currently tests what happens when you change a symbol from
-### having a value to not having a value or vice versa. This is not
-### necessarily useful behavior, and we may not consider it a bug if
-### config.py stops handling that case correctly.
+# A list of symbols to test with.
+# This script currently tests what happens when you change a symbol from
+# having a value to not having a value or vice versa. This is not
+# necessarily useful behavior, and we may not consider it a bug if
+# config.py stops handling that case correctly.
 TEST_SYMBOLS = [
     "CUSTOM_SYMBOL",  # does not exist
     "MBEDTLS_AES_C",  # set, no value
