@@ -328,7 +328,7 @@ def get_chromium_main_position(commit):
     result = exec_cmd(cmd, chromium_src_dir)
     if result["out"] != "":
         match = re.search(r"refs/heads/(?:master|main)@{#([\d]+)}", result["out"])
-        assert match != None, "Failed to find position"
+        assert match is not None, "Failed to find position"
         return int(match.groups()[0])
     return None
 
@@ -342,7 +342,7 @@ def get_chromium_main_commit(position):
     result = exec_cmd(cmd, chromium_src_dir)
     if result["out"] != "":
         match = re.search(r"^commit ([a-f0-9]+)", result["out"])
-        assert match != None, "Failed to find commit"
+        assert match is not None, "Failed to find commit"
         return match.groups()[0]
     return None
 
@@ -454,7 +454,7 @@ def check_pattern_matches(output_file=None):
                     line = line.strip()
                     if len(line) == 0:
                         continue
-                    skip = re_exclude is not None and re_exclude.match(line) != None
+                    skip = re_exclude is not None and re_exclude.match(line) is not None
                     if not skip:
                         if write_msg:
                             if has_output:

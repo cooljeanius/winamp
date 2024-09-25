@@ -592,7 +592,8 @@ class ParseFunctionCode(TestCase):
         # Pylint ignores that the method got via getattr is
         # conditionally executed. Method has to be a callable.
         # Hence, using a dummy callable for getattr default.
-        dummy = lambda *x: None
+        def dummy(*x):
+            return None
         # First Python 3 assertRaisesRegex is checked, since Python 2
         # assertRaisesRegexp is also available in Python 3 but is
         # marked deprecated.
