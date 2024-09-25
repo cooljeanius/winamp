@@ -101,7 +101,7 @@ def read_outcome_file(outcome_file):
     The keys are the test suite name and the test case description, separated
     by a semicolon."""
     outcomes = {}
-    with open(outcome_file, "r", encoding="utf-8") as input_file:
+    with open(outcome_file, encoding="utf-8") as input_file:
         for line in input_file:
             (platform, config, suite, case, result, _cause) = line.split(";")
             key = ";".join([suite, case])

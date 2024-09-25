@@ -219,7 +219,7 @@ class FileWrapper(io.FileIO):
 
         :param file_name: File path to open.
         """
-        super(FileWrapper, self).__init__(file_name, "r")
+        super().__init__(file_name, "r")
         self._line_no = 0
 
     def next(self):
@@ -233,7 +233,7 @@ class FileWrapper(io.FileIO):
 
         :return: Line read from file.
         """
-        parent = super(FileWrapper, self)
+        parent = super()
         if hasattr(parent, "__next__"):
             line = parent.__next__()  # Python 3
         else:
@@ -284,7 +284,7 @@ def gen_dependencies(dependencies):
              readability.
     """
     dep_start = "".join(
-        ["#if %sdefined(%s)\n" % (x, y) for x, y in map(split_dep, dependencies)]
+        ["#if {}defined({})\n".format(x, y) for x, y in map(split_dep, dependencies)]
     )
     dep_end = "".join(["#endif /* %s */\n" % x for x in reversed(dependencies)])
 
@@ -301,7 +301,7 @@ def gen_dependencies_one_line(dependencies):
     """
     defines = "#if " if dependencies else ""
     defines += " && ".join(
-        ["%sdefined(%s)" % (x, y) for x, y in map(split_dep, dependencies)]
+        ["{}defined({})".format(x, y) for x, y in map(split_dep, dependencies)]
     )
     return defines
 
@@ -383,7 +383,7 @@ def parse_until_pattern(funcs_f, end_regex):
         headers += line
     else:
         raise GeneratorInputError(
-            "file: %s - end pattern [%s] not found!" % (funcs_f.name, end_regex)
+            "file: {} - end pattern [{}] not found!".format(funcs_f.name, end_regex)
         )
 
     return headers
@@ -992,7 +992,7 @@ def read_code_from_input_files(platform_file, helpers_file, out_data_file, snipp
     :return:
     """
     # Read helpers
-    with open(helpers_file, "r") as help_f, open(platform_file, "r") as platform_f:
+    with open(helpers_file) as help_f, open(platform_file) as platform_f:
         snippets["test_common_helper_file"] = helpers_file
         snippets["test_common_helpers"] = help_f.read()
         snippets["test_platform_file"] = platform_file
@@ -1010,7 +1010,7 @@ def write_test_source_file(template_file, c_file, snippets):
     :param snippets: Generated and code snippets
     :return:
     """
-    with open(template_file, "r") as template_f, open(c_file, "w") as c_f:
+    with open(template_file) as template_f, open(c_file, "w") as c_f:
         for line_no, line in enumerate(template_f.readlines(), 1):
             # Update line number. +1 as #line directive sets next line number
             snippets["line_no"] = line_no + 1
@@ -1092,7 +1092,7 @@ def generate_code(**input_info):
         ("Suites dir", suites_dir),
     ]:
         if not os.path.exists(path):
-            raise IOError("ERROR: %s [%s] not found!" % (name, path))
+            raise OSError("ERROR: {} [{}] not found!".format(name, path))
 
     snippets = {"generator_script": os.path.basename(__file__)}
     read_code_from_input_files(platform_file, helpers_file, out_data_file, snippets)
@@ -1206,4 +1206,4 @@ if __name__ == "__main__":
     try:
         main()
     except GeneratorInputError as err:
-        sys.exit("%s: input error: %s" % (os.path.basename(sys.argv[0]), str(err)))
+        sys.exit("{}: input error: {}".format(os.path.basename(sys.argv[0]), str(err)))

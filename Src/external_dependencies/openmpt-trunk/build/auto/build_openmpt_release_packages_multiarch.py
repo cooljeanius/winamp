@@ -32,7 +32,7 @@ for arg in sys.argv:
 
 
 def get_version_number():
-    with open('common/versionNumber.h', 'r') as f:
+    with open('common/versionNumber.h') as f:
         lines = f.readlines()
     majormajor = 0
     major = 0

@@ -305,7 +305,7 @@ class MacroCollector:
 
     @staticmethod
     def _make_return_case(name):
-        return 'case %(name)s: return "%(name)s";' % {"name": name}
+        return 'case {name}: return "{name}";'.format(name=name)
 
     @staticmethod
     def _make_append_case(name):

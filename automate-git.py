@@ -2,9 +2,6 @@
 # reserved. Use of this source code is governed by a BSD-style license that
 # can be found in the LICENSE file.
 
-from __future__ import absolute_import
-from __future__ import print_function
-from io import open
 from optparse import OptionParser
 import os
 import re
@@ -104,7 +101,7 @@ def copy_directory(source, target, allow_overwrite=False):
             raise Exception("Directory %s already exists" % (target))
         remove_directory(target)
     if os.path.exists(source):
-        msg("Copying directory %s to %s" % (source, target))
+        msg("Copying directory {} to {}".format(source, target))
         if not options.dryrun:
             shutil.copytree(source, target)
 
@@ -116,7 +113,7 @@ def move_directory(source, target, allow_overwrite=False):
             raise Exception("Directory %s already exists" % (target))
         remove_directory(target)
     if os.path.exists(source):
-        msg("Moving directory %s to %s" % (source, target))
+        msg("Moving directory {} to {}".format(source, target))
         if not options.dryrun:
             shutil.move(source, target)
 
@@ -130,7 +127,7 @@ def exec_cmd(cmd, path):
     """Execute the specified command and return the result."""
     out = ""
     err = ""
-    sys.stdout.write('-------- Running "%s" in "%s"...\n' % (cmd, path))
+    sys.stdout.write('-------- Running "{}" in "{}"...\n'.format(cmd, path))
     parts = cmd.split()
     try:
         process = subprocess.Popen(
@@ -141,7 +138,7 @@ def exec_cmd(cmd, path):
             shell=(sys.platform == "win32"),
         )
         out, err = process.communicate()
-    except IOError as e:
+    except OSError as e:
         (errno, strerror) = e.args
         raise
     except:
@@ -151,7 +148,7 @@ def exec_cmd(cmd, path):
 
 def get_git_hash(path, branch):
     """Returns the git hash for the specified branch/tag/hash."""
-    cmd = "%s rev-parse %s" % (git_exe, branch)
+    cmd = "{} rev-parse {}".format(git_exe, branch)
     result = exec_cmd(cmd, path)
     if result["out"] != "":
         return result["out"].strip()
@@ -208,7 +205,7 @@ def download_and_extract(src, target):
 def read_file(path):
     """Read a file."""
     if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as fp:
+        with open(path, encoding="utf-8") as fp:
             return fp.read()
     else:
         raise Exception("Path does not exist: %s" % (path))
@@ -239,7 +236,7 @@ def write_config_file(path, contents):
     """Write a configuration file."""
     data = "{\n"
     for key in sorted(contents.keys()):
-        data += "  '%s': '%s',\n" % (key, contents[key])
+        data += "  '{}': '{}',\n".format(key, contents[key])
     data += "}\n"
     write_file(path, data)
 
@@ -294,7 +291,12 @@ def run_patch_updater(args="", output_file=None):
     tool = os.path.join(cef_src_dir, "tools", "patch_updater.py")
     if len(args) > 0:
         args = " " + args
-    run("%s %s%s" % (python_exe, tool, args), cef_src_dir, depot_tools_dir, output_file)
+    run(
+        "{} {}{}".format(python_exe, tool, args),
+        cef_src_dir,
+        depot_tools_dir,
+        output_file,
+    )
 
 
 def onerror(func, path, exc_info):
@@ -322,7 +324,7 @@ def get_chromium_main_position(commit):
     """Returns the closest main position for the specified Chromium commit."""
     # Using -2 because a "Publish DEPS" commit which does not have a master
     # position may be first.
-    cmd = "%s log -2 %s" % (git_exe, commit)
+    cmd = "{} log -2 {}".format(git_exe, commit)
     result = exec_cmd(cmd, chromium_src_dir)
     if result["out"] != "":
         match = re.search(r"refs/heads/(?:master|main)@{#([\d]+)}", result["out"])
@@ -402,7 +404,7 @@ def log_chromium_changes():
             get_chromium_main_position(chromium_checkout)
         )
 
-        cmd = "%s diff --relative --no-prefix %s..%s -- %s" % (
+        cmd = "{} diff --relative --no-prefix {}..{} -- {}".format(
             git_exe,
             old_commit,
             new_commit,
@@ -436,7 +438,7 @@ def check_pattern_matches(output_file=None):
             os.write(pattern_handle, entry["pattern"])
             os.close(pattern_handle)
 
-            cmd = "%s grep -n -f %s" % (git_exe, pattern_file)
+            cmd = "{} grep -n -f {}".format(git_exe, pattern_file)
             result = exec_cmd(cmd, chromium_src_dir)
             os.remove(pattern_file)
 
@@ -1110,7 +1112,7 @@ if not os.path.exists(depot_tools_dir):
 
     if options.depottoolsarchive != "":
         # Extract depot_tools from an archive file.
-        msg("Extracting %s to %s." % (options.depottoolsarchive, depot_tools_dir))
+        msg("Extracting {} to {}.".format(options.depottoolsarchive, depot_tools_dir))
         if not options.dryrun:
             download_and_extract(options.depottoolsarchive, depot_tools_dir)
     else:
@@ -1187,7 +1189,11 @@ else:
 # Create the CEF checkout if necessary.
 if not options.nocefupdate and not os.path.exists(cef_dir):
     cef_checkout_new = True
-    run("%s clone %s %s" % (git_exe, cef_url, cef_dir), download_dir, depot_tools_dir)
+    run(
+        "{} clone {} {}".format(git_exe, cef_url, cef_dir),
+        download_dir,
+        depot_tools_dir,
+    )
 else:
     cef_checkout_new = False
 
@@ -1208,7 +1214,7 @@ if not options.nocefupdate and os.path.exists(cef_dir):
     )
 
     msg("CEF Current Checkout: %s" % (cef_current_hash))
-    msg("CEF Desired Checkout: %s (%s)" % (cef_desired_hash, cef_checkout))
+    msg("CEF Desired Checkout: {} ({})".format(cef_desired_hash, cef_checkout))
 
     if cef_checkout_changed:
         if cef_dir == cef_src_dir:
@@ -1499,11 +1505,11 @@ if not options.nobuild and (
             or key.startswith("GYP_")
             or key.startswith("DEPOT_TOOLS_")
         ):
-            msg("%s=%s" % (key, os.environ[key]))
+            msg("{}={}".format(key, os.environ[key]))
 
     # Generate project files.
     tool = os.path.join(cef_src_dir, "tools", "gclient_hook.py")
-    run("%s %s" % (python_exe, tool), cef_src_dir, depot_tools_dir)
+    run("{} {}".format(python_exe, tool), cef_src_dir, depot_tools_dir)
 
     # Build using Ninja.
     command = "ninja "
@@ -1598,7 +1604,9 @@ if options.runtests:
     if platform == "windows":
         test_exe = "%s.exe" % options.testtarget
     elif platform == "mac":
-        test_exe = "%s.app/Contents/MacOS/%s" % (options.testtarget, options.testtarget)
+        test_exe = "{}.app/Contents/MacOS/{}".format(
+            options.testtarget, options.testtarget
+        )
     elif platform == "linux":
         test_exe = options.testtarget
 

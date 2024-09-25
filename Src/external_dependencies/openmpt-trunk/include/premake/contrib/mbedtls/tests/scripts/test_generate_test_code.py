@@ -31,7 +31,7 @@ from unittest import TestCase, main as unittest_main
 
 try:
     # Python 2
-    from mock import patch
+    from unittest.mock import patch
 except ImportError:
     # Python 3
     from unittest.mock import patch
@@ -326,7 +326,7 @@ class StringIOWrapper(StringIO):
         :param data:
         :param line_no:
         """
-        super(StringIOWrapper, self).__init__(data)
+        super().__init__(data)
         self.line_no = line_no
         self.name = file_name
 
@@ -338,7 +338,7 @@ class StringIOWrapper(StringIO):
 
         :return: Line read from file.
         """
-        parent = super(StringIOWrapper, self)
+        parent = super()
         if getattr(parent, "next", None):
             # Python 2
             line = parent.next()
@@ -358,7 +358,7 @@ class StringIOWrapper(StringIO):
         :return:
         """
         # pylint: disable=unused-argument
-        line = super(StringIOWrapper, self).readline()
+        line = super().readline()
         if line is not None:
             self.line_no += 1
         return line
@@ -583,7 +583,7 @@ class ParseFunctionCode(TestCase):
         :param func: callable object under test
         :param args: variable positional arguments
         """
-        parent = super(ParseFunctionCode, self)
+        parent = super()
 
         # Pylint does not appreciate that the super method called
         # conditionally can be available in other Python version

@@ -36,7 +36,7 @@ import tempfile
 class ReadFileLineException(Exception):
     def __init__(self, filename, line_number):
         message = "in {} at {}".format(filename, line_number)
-        super(ReadFileLineException, self).__init__(message)
+        super().__init__(message)
         self.filename = filename
         self.line_number = line_number
 
@@ -93,17 +93,17 @@ class Inputs:
     def __init__(self):
         self.all_declared = set()
         # Sets of names per type
-        self.statuses = set(["PSA_SUCCESS"])
-        self.algorithms = set(["0xffffffff"])
-        self.ecc_curves = set(["0xff"])
-        self.dh_groups = set(["0xff"])
-        self.key_types = set(["0xffff"])
-        self.key_usage_flags = set(["0x80000000"])
+        self.statuses = {"PSA_SUCCESS"}
+        self.algorithms = {"0xffffffff"}
+        self.ecc_curves = {"0xff"}
+        self.dh_groups = {"0xff"}
+        self.key_types = {"0xffff"}
+        self.key_usage_flags = {"0x80000000"}
         # Hard-coded value for unknown algorithms
-        self.hash_algorithms = set(["0x020000fe"])
-        self.mac_algorithms = set(["0x0300ffff"])
-        self.ka_algorithms = set(["0x09fc0000"])
-        self.kdf_algorithms = set(["0x080000ff"])
+        self.hash_algorithms = {"0x020000fe"}
+        self.mac_algorithms = {"0x0300ffff"}
+        self.ka_algorithms = {"0x09fc0000"}
+        self.kdf_algorithms = {"0x080000ff"}
         # For AEAD algorithms, the only variability is over the tag length,
         # and this only applies to known algorithms, so don't test an
         # unknown algorithm.
@@ -226,17 +226,15 @@ class Inputs:
     # Regex of macro names to exclude.
     _excluded_name_re = re.compile(r"_(?:GET|IS|OF)_|_(?:BASE|FLAG|MASK)\Z")
     # Additional excluded macros.
-    _excluded_names = set(
-        [
-            # Macros that provide an alternative way to build the same
-            # algorithm as another macro.
-            "PSA_ALG_AEAD_WITH_DEFAULT_TAG_LENGTH",
-            "PSA_ALG_FULL_LENGTH_MAC",
-            # Auxiliary macro whose name doesn't fit the usual patterns for
-            # auxiliary macros.
-            "PSA_ALG_AEAD_WITH_DEFAULT_TAG_LENGTH_CASE",
-        ]
-    )
+    _excluded_names = {
+        # Macros that provide an alternative way to build the same
+        # algorithm as another macro.
+        "PSA_ALG_AEAD_WITH_DEFAULT_TAG_LENGTH",
+        "PSA_ALG_FULL_LENGTH_MAC",
+        # Auxiliary macro whose name doesn't fit the usual patterns for
+        # auxiliary macros.
+        "PSA_ALG_AEAD_WITH_DEFAULT_TAG_LENGTH_CASE",
+    }
 
     def parse_header_line(self, line):
         """Parse a C header line, looking for "#define PSA_xxx"."""

@@ -65,7 +65,7 @@ class TestDataParser:
 
         :param data_file: Data file path
         """
-        with open(data_file, "r") as data_f:
+        with open(data_file) as data_f:
             self.__parse(data_f)
 
     @staticmethod
@@ -164,7 +164,7 @@ class MbedTlsTest(BaseHostTest):
         """
         Constructor initialises test index to 0.
         """
-        super(MbedTlsTest, self).__init__()
+        super().__init__()
         self.tests = []
         self.test_index = -1
         self.dep_index = 0

@@ -383,7 +383,7 @@ class ConfigFile(Config):
         super().__init__()
         self.filename = filename
         self.current_section = "header"
-        with open(filename, "r", encoding="utf-8") as file:
+        with open(filename, encoding="utf-8") as file:
             self.templates = [self._parse_line(line) for line in file]
         self.current_section = None
 
