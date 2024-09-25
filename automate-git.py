@@ -4,7 +4,6 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-from datetime import datetime
 from io import open
 from optparse import OptionParser
 import os
@@ -20,9 +19,8 @@ is_python2 = sys.version_info.major == 2
 
 if is_python2:
     from urllib import FancyURLopener
-    from urllib2 import urlopen
 else:
-    from urllib.request import FancyURLopener, urlopen
+    from urllib.request import FancyURLopener
 
 ##
 # Default URLs.
@@ -54,7 +52,7 @@ def run(command_line, working_dir, depot_tools_dir=None, output_file=None):
     """Runs the specified command."""
     # add depot_tools to the path
     env = os.environ
-    if not depot_tools_dir is None:
+    if depot_tools_dir is not None:
         env["PATH"] = depot_tools_dir + os.pathsep + env["PATH"]
 
     sys.stdout.write(
@@ -354,7 +352,7 @@ def get_build_compat_versions():
     msg("Reading %s" % compat_path)
     config = read_config_file(compat_path)
 
-    if not "chromium_checkout" in config:
+    if "chromium_checkout" not in config:
         raise Exception("Missing chromium_checkout value in %s" % (compat_path))
     return config
 
@@ -454,7 +452,7 @@ def check_pattern_matches(output_file=None):
                     line = line.strip()
                     if len(line) == 0:
                         continue
-                    skip = not re_exclude is None and re_exclude.match(line) != None
+                    skip = re_exclude is not None and re_exclude.match(line) != None
                     if not skip:
                         if write_msg:
                             if has_output:
@@ -470,7 +468,7 @@ def check_pattern_matches(output_file=None):
                         write_fp(fp, line + "\n")
                         has_output = True
 
-        if not output_file is None:
+        if output_file is not None:
             if has_output:
                 msg("ERROR Matches found. See %s for output." % out_file)
             else:
@@ -963,7 +961,7 @@ if (options.buildtests or options.runtests) and len(options.testtarget) == 0:
 # Operating system.
 if options.dryrun and options.dryrunplatform is not None:
     platform = options.dryrunplatform
-    if not platform in ["windows", "mac", "linux"]:
+    if platform not in ["windows", "mac", "linux"]:
         print("Invalid dry-run-platform value: %s" % (platform))
         sys.exit(1)
 elif sys.platform == "win32":
@@ -1017,7 +1015,7 @@ branch_is_3945_or_newer = branch_is_master or int(cef_branch) >= 3945
 if (
     branch_is_3945_or_newer
     and not is_python2
-    and not "GCLIENT_PY3" in os.environ.keys()
+    and "GCLIENT_PY3" not in os.environ.keys()
 ):
     os.environ["GCLIENT_PY3"] = "1"
 
@@ -1049,7 +1047,7 @@ sandbox_lib_platforms = ["windows"]
 if branch_is_3538_or_newer:
     sandbox_lib_platforms.append("mac")
 
-if not platform in sandbox_lib_platforms and (
+if platform not in sandbox_lib_platforms and (
     options.sandboxdistrib or options.sandboxdistribonly
 ):
     print("The sandbox distribution is not supported on this platform.")

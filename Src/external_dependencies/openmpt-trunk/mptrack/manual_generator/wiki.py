@@ -7,7 +7,10 @@
 # HTML Help Workshop to generate a CHM file.
 
 from urllib.request import urlopen, urlretrieve
-import re, os, shutil, subprocess
+import re
+import os
+import shutil
+import subprocess
 
 base_url = "https://wiki.openmpt.org"
 base_url_regex = "https?://wiki.openmpt.org"

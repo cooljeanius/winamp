@@ -5,7 +5,9 @@
 from pathlib import Path
 from subprocess import Popen
 from sys import executable
-import os, shutil, hashlib
+import os
+import shutil
+import hashlib
 import sys
 
 path7z = "C:\\Program Files\\7-Zip\\7z.exe"
